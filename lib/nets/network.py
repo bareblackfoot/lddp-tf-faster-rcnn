@@ -20,6 +20,7 @@ from layer_utils.proposal_top_layer import proposal_top_layer
 from layer_utils.anchor_target_layer import anchor_target_layer
 from layer_utils.proposal_target_layer import proposal_target_layer
 from utils.visualization import draw_bounding_boxes
+from layer_utils.dpp_loss_layer import LDDPLossLayer
 
 from model.config import cfg
 
@@ -280,13 +281,19 @@ class Network(object):
       self._losses['rpn_cross_entropy'] = rpn_cross_entropy
       self._losses['rpn_loss_box'] = rpn_loss_box
 
-      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
+      stds = np.tile(np.array(cfg.TRAIN.BBOX_NORMALIZE_STDS), (self._num_classes))
+      means = np.tile(np.array(cfg.TRAIN.BBOX_NORMALIZE_MEANS), (self._num_classes))
+      LDDP = LDDPLossLayer(bbox_pred, cls_score, self._gt_boxes, self._proposal_targets['rois'], tf.transpose(self._image,[0,3,1,2]), tf.squeeze(self._proposal_targets["labels"]), bbox_targets, tf.convert_to_tensor(means,dtype=tf.float32), tf.convert_to_tensor(stds,dtype=tf.float32), "lddp")
+      dpp_loss = LDDP.lddp_loss()
+      self._losses['lddp_loss'] = dpp_loss*0.001
+      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + 0.001*dpp_loss
       regularization_loss = tf.add_n(tf.losses.get_regularization_losses(), 'regu')
       self._losses['total_loss'] = loss + regularization_loss
 
       self._event_summaries.update(self._losses)
 
     return loss
+
 
   def _region_proposal(self, net_conv, is_training, initializer):
     rpn = slim.conv2d(net_conv, cfg.RPN_CHANNELS, [3, 3], trainable=is_training, weights_initializer=initializer,
@@ -456,27 +463,29 @@ class Network(object):
   def train_step(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, lddp_loss, loss, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                         self._losses['rpn_loss_box'],
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
+                                                                        self._losses['lddp_loss'],
                                                                         self._losses['total_loss'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
-    return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
+    return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, lddp_loss, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, summary, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, lddp_loss, loss, summary, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                                  self._losses['rpn_loss_box'],
                                                                                  self._losses['cross_entropy'],
                                                                                  self._losses['loss_box'],
+                                                                                 self._losses['lddp_loss'],
                                                                                  self._losses['total_loss'],
                                                                                  self._summary_op,
                                                                                  train_op],
                                                                                 feed_dict=feed_dict)
-    return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, summary
+    return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, lddp_loss, loss, summary
 
   def train_step_no_return(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],

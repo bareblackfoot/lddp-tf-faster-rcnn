@@ -18,6 +18,18 @@ cfg = __C
 #
 __C.TRAIN = edict()
 
+# LDDP
+
+__C.TRAIN.IMDB = ''
+__C.TRAIN.SIM_POWER = 1.0
+__C.TRAIN.PROB_THRESH = 0.00001
+__C.TRAIN.vis = 0
+__C.TRAIN.IoU_gt_thresh = 0.5
+__C.TRAIN.IGNORANCE = 0.2
+__C.TRAIN.similarity_path = "/home/blackfoot/only_eval/lddp-tf-faster-rcnn/data/pascal_voc_semantics.pickle"
+__C.TRAIN.info = "../data/info.json"
+# END_LDDP
+
 # Initial learning rate
 __C.TRAIN.LEARNING_RATE = 0.001
 
@@ -163,7 +175,13 @@ __C.TRAIN.USE_ALL_GT = True
 # Testing options
 #
 __C.TEST = edict()
-
+# LDDP
+__C.TEST.PROB_THRESH = 0.4
+__C.TEST.SIM_POWER = 4.0
+__C.TEST.MC_NMS = 0.7
+__C.TEST.DPP_NMS = 0.001
+__C.TEST.SCORE_THRESH = 0.05
+# END_LDDP
 # Scale to use during testing (can NOT list multiple scales)
 # The scale is the pixel size of an image's shortest side
 __C.TEST.SCALES = (600,)

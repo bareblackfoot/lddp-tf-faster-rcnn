@@ -8,7 +8,7 @@ from __future__ import division
 from __future__ import print_function
 
 import _init_paths
-from model.test import test_net
+from model.test import test_net, dpp_test_net, test_net_MC
 from model.config import cfg, cfg_from_file, cfg_from_list
 from datasets.factory import get_imdb
 import argparse
@@ -117,6 +117,7 @@ if __name__ == '__main__':
     sess.run(tf.global_variables_initializer())
     print('Loaded.')
 
-  test_net(sess, net, imdb, filename, max_per_image=args.max_per_image)
-
+  # test_net(sess, net, imdb, filename, max_per_image=args.max_per_image)
+  dpp_test_net(sess, net, imdb,filename, max_per_image=args.max_per_image)
+  # test_net_MC(sess, net, imdb, filename, max_per_image=args.max_per_image)
   sess.close()

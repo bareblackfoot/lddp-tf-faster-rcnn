@@ -12,7 +12,7 @@ from __future__ import print_function
 
 __sets = {}
 from datasets.pascal_voc import pascal_voc
-from datasets.coco import coco
+# from datasets.coco import coco
 
 import numpy as np
 
