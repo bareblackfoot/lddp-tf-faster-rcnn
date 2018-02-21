@@ -20,6 +20,9 @@ from nets.vgg16 import vgg16
 from nets.resnet_v1 import resnetv1
 from nets.mobilenet_v1 import mobilenetv1
 
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["OMP_NUM_THREADS"] = "1"
+# os.environ["OPENBLAS_NUM_THREADS"] = "1"
 def parse_args():
   """
   Parse input arguments

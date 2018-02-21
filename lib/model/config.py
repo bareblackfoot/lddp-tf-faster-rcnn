@@ -380,7 +380,7 @@ def cfg_from_file(filename):
 def cfg_from_list(cfg_list):
   """Set config keys via list (e.g., from command line)."""
   from ast import literal_eval
-  assert len(cfg_list) % 2 == 0
+  # assert len(cfg_list) % 2 == 0
   for k, v in zip(cfg_list[0::2], cfg_list[1::2]):
     key_list = k.split('.')
     d = __C

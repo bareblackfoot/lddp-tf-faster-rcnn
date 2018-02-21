@@ -208,7 +208,7 @@ class LDDPLossLayer(object):
             normalizer_Y = (len(B) + 1) / np.float(len(list(Y) + list(B)) + 1)
             normalizer_B = (len(Y) + 1) / np.float(len(list(Y) + list(B)) + 1)
 
-        return (-normalizer_Y * sum(log_p_Y) + normalizer_B * sum(log_p_B)).astype(np.float32)
+        return ((-normalizer_Y * sum(log_p_Y) + normalizer_B * sum(log_p_B))*self._loss_weight).astype(np.float32)
 
     def _lddp_loss_gradient_layer(self, bbox_pred, cls_score, gt_boxes, rois, data, labels, bbox_targets, means, stds, grad):
         """

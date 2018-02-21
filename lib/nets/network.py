@@ -285,8 +285,8 @@ class Network(object):
       means = np.tile(np.array(cfg.TRAIN.BBOX_NORMALIZE_MEANS), (self._num_classes))
       LDDP = LDDPLossLayer(bbox_pred, cls_score, self._gt_boxes, self._proposal_targets['rois'], tf.transpose(self._image,[0,3,1,2]), tf.squeeze(self._proposal_targets["labels"]), bbox_targets, tf.convert_to_tensor(means,dtype=tf.float32), tf.convert_to_tensor(stds,dtype=tf.float32), "lddp")
       dpp_loss = LDDP.lddp_loss()
-      self._losses['lddp_loss'] = dpp_loss*0.001
-      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + 0.001*dpp_loss
+      self._losses['lddp_loss'] = 0.0001*dpp_loss
+      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + 0.0001*dpp_loss
       regularization_loss = tf.add_n(tf.losses.get_regularization_losses(), 'regu')
       self._losses['total_loss'] = loss + regularization_loss
 
