@@ -26,7 +26,7 @@ __C.TRAIN.PROB_THRESH = 0.00001
 __C.TRAIN.vis = 0
 __C.TRAIN.IoU_gt_thresh = 0.5
 __C.TRAIN.IGNORANCE = 0.2
-__C.TRAIN.similarity_path = "/home/blackfoot/only_eval/lddp-tf-faster-rcnn/data/pascal_voc_semantics.pickle"
+__C.TRAIN.similarity_path = "../data/coco_semantics.pickle"
 __C.TRAIN.info = "../data/info.json"
 # END_LDDP
 

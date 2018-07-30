@@ -314,7 +314,7 @@ def dpp_test_net(sess, net, imdb, weights_filename, max_per_image=100, thresh=0.
   if not cfg.TEST.HAS_RPN:
     roidb = imdb.roidb
   im_dets_pair = {}
-  sim_classes = pickle.load(open("/home/blackfoot/only_eval/lddp-tf-faster-rcnn/data/pascal_voc_semantics.pickle", "r"))
+  sim_classes = pickle.load(open(cfg.TRAIN.similarity_path, "r"))
 
   ff = {}
   for j in xrange(1, imdb.num_classes):
