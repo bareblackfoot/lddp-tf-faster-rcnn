@@ -1,7 +1,5 @@
 # tf-faster-rcnn
-A Tensorflow implementation of faster RCNN detection framework by Xinlei Chen (xinleic@cs.cmu.edu). This repository is based on the python Caffe implementation of faster RCNN available [here](https://github.com/rbgirshick/py-faster-rcnn).
-
-**Note**: Several minor modifications are made when reimplementing the framework, which give potential improvements. For details about the modifications and ablative analysis, please refer to the technical report [An Implementation of Faster RCNN with Study for Region Sampling](https://arxiv.org/pdf/1702.02138.pdf). If you are seeking to reproduce the results in the original paper, please use the [official code](https://github.com/ShaoqingRen/faster_rcnn) or maybe the [semi-official code](https://github.com/rbgirshick/py-faster-rcnn). For details about the faster RCNN architecture please refer to the paper [Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks](http://arxiv.org/pdf/1506.01497.pdf).
+A Tensorflow implementation of [Learning detection with diverse proposals](http://openaccess.thecvf.com/content_cvpr_2017/papers/Azadi_Learning_Detection_With_CVPR_2017_paper.pdf) by Nuri Kim. 
 
 ### Detection Performance
 The current code supports **VGG16**, **Resnet V1** and **Mobilenet V1** models. We mainly tested it on plain VGG16 and Resnet101 (thank you @philokey!) architecture. As the baseline, we report numbers using a single model on a single convolution layer, so no multi-scale, no multi-stage bounding box regression, no skip-connection, no extra input is used. The only data augmentation technique is left-right flipping during training following the original Faster RCNN. All models are released.
@@ -42,12 +40,6 @@ Approximate *baseline* [setup](https://github.com/endernewton/tf-faster-rcnn/blo
 ![](data/imgs/gt.png)      |  ![](data/imgs/pred.png)
 :-------------------------:|:-------------------------:
 Displayed Ground Truth on Tensorboard |  Displayed Predictions on Tensorboard
-
-### Additional features
-Additional features not mentioned in the [report](https://arxiv.org/pdf/1702.02138.pdf) are added to make research life easier:
-  - **Support for train-and-validation**. During training, the validation data will also be tested from time to time to monitor the process and check potential overfitting. Ideally training and validation should be separate, where the model is loaded every time to test on validation. However I have implemented it in a joint way to save time and GPU memory. Though in the default setup the testing data is used for validation, no special attempts is made to overfit on testing set.
-  - **Support for resuming training**. I tried to store as much information as possible when snapshoting, with the purpose to resume training from the latest snapshot properly. The meta information includes current image index, permutation of images, and random state of numpy. However, when you resume training the random seed for tensorflow will be reset (not sure how to save the random state of tensorflow now), so it will result in a difference. **Note** that, the current implementation still cannot force the model to behave deterministically even with the random seeds set. Suggestion/solution is welcome and much appreciated.
-  - **Support for visualization**. The current implementation will summarize ground truth boxes, statistics of losses, activations and variables during training, and dump it to a separate folder for tensorboard visualization. The computing graph is also saved for debugging.
 
 ### Prerequisites
   - A basic Tensorflow installation. The code follows **r1.2** format. If you are using r1.0, please check out the r1.0 branch to fix the slim Resnet block issue. If you are using an older version (r0.1-r0.12), please check out the r0.12 branch. While it is not required, for experimenting the original RoI pooling (which requires modification of the C++ code in tensorflow), you can check out my tensorflow [fork](https://github.com/endernewton/tensorflow) and look for ``tf.image.roi_pooling``.
@@ -204,34 +196,3 @@ Tensorboard information for train and validation is saved under:
 tensorboard/[NET]/[DATASET]/default/
 tensorboard/[NET]/[DATASET]/default_val/
 ```
-
-The default number of training iterations is kept the same to the original faster RCNN for VOC 2007, however I find it is beneficial to train longer (see [report](https://arxiv.org/pdf/1702.02138.pdf) for COCO), probably due to the fact that the image batch size is one. For VOC 07+12 we switch to a 80k/110k schedule following [R-FCN](https://github.com/daijifeng001/R-FCN). Also note that due to the nondeterministic nature of the current implementation, the performance can vary a bit, but in general it should be within ~1% of the reported numbers for VOC, and ~0.2% of the reported numbers for COCO. Suggestions/Contributions are welcome.
-
-### Citation
-If you find this implementation or the analysis conducted in our report helpful, please consider citing:
-
-    @article{chen17implementation,
-        Author = {Xinlei Chen and Abhinav Gupta},
-        Title = {An Implementation of Faster RCNN with Study for Region Sampling},
-        Journal = {arXiv preprint arXiv:1702.02138},
-        Year = {2017}
-    }
-    
-Or for a formal paper, [Spatial Memory Network](https://arxiv.org/abs/1704.04224):
-
-    @article{chen2017spatial,
-      title={Spatial Memory for Context Reasoning in Object Detection},
-      author={Chen, Xinlei and Gupta, Abhinav},
-      journal={arXiv preprint arXiv:1704.04224},
-      year={2017}
-    }
-
-For convenience, here is the faster RCNN citation:
-
-    @inproceedings{renNIPS15fasterrcnn,
-        Author = {Shaoqing Ren and Kaiming He and Ross Girshick and Jian Sun},
-        Title = {Faster {R-CNN}: Towards Real-Time Object Detection
-                 with Region Proposal Networks},
-        Booktitle = {Advances in Neural Information Processing Systems ({NIPS})},
-        Year = {2015}
-    }
