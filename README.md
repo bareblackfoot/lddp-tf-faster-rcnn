@@ -1,4 +1,4 @@
-# tf-faster-rcnn
+# Learning detection with diverse proposals
 A Tensorflow implementation of [Learning detection with diverse proposals](http://openaccess.thecvf.com/content_cvpr_2017/papers/Azadi_Learning_Detection_With_CVPR_2017_paper.pdf) by Nuri Kim. This repository is based on the Faster R-CNN implementation available [here](https://github.com/endernewton/tf-faster-rcnn).
 
 ### Detection Performance
